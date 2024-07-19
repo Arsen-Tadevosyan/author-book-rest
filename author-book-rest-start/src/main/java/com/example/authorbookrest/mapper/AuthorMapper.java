@@ -8,13 +8,13 @@ import org.mapstruct.Mapping;
 
 import java.time.LocalDate;
 
-@Mapper(componentModel = "spring",imports = LocalDate.class)
+@Mapper(componentModel = "spring", imports = LocalDate.class)
 public interface AuthorMapper {
 
-    @Mapping(target = "firstName",source = "name")
+    @Mapping(target = "firstName", source = "name")
     AuthorResponseDto map(Author author);
 
-    @Mapping(target = "createdDate",expression = "java(LocalDate.now())")
+    @Mapping(target = "createdDate", expression = "java(LocalDate.now())")
     Author map(SaveAuthorDto saveAuthorDto);
-    
+
 }

@@ -6,6 +6,7 @@ import com.example.authorbookrest.dto.BookResponseDto;
 import com.example.authorbookrest.dto.SaveBookDto;
 import com.example.authorbookrest.entity.Book;
 import com.example.authorbookrest.entity.QBook;
+import com.example.authorbookrest.exception.AuthorNotFoundException;
 import com.example.authorbookrest.exception.BookNotFoundException;
 import com.example.authorbookrest.mapper.BookMapper;
 import com.example.authorbookrest.repository.AuthorRepository;
@@ -23,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,17 +37,18 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto save(SaveBookDto saveBookDto) {
-        Book book = bookMapper.map(saveBookDto);
-        book.setAuthor(authorRepository.findById(saveBookDto.getAuthorId()).orElse(null));
-        Book savedUser = bookRepository.save(book);
+        var book = bookMapper.map(saveBookDto);
+        book.setAuthor(authorRepository.findById(saveBookDto.getAuthorId()).orElseThrow(() ->
+                new AuthorNotFoundException("Author does not exist with Id: " + saveBookDto.getAuthorId())));
+        var savedUser = bookRepository.save(book);
         log.info("Book saved successfully with ID: {}", savedUser.getId());
         return bookMapper.map(savedUser);
     }
 
     @Override
     public List<BookDto> getRandom() {
-        List<Book> random = bookRepository.findRandomLimited();
-        List<BookDto> bookDtos = bookMapper.mapToDto(random);
+        var random = bookRepository.findRandomLimited();
+        var bookDtos = bookMapper.mapToDto(random);
         log.info("Fetched {} random books", bookDtos.size());
         return bookDtos;
     }
@@ -84,31 +85,24 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<BookResponseDto> getByTitle(String title, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Book> byTitle = bookRepository.findByTitleContaining(title, pageable);
+        var pageable = PageRequest.of(page, size);
+        var byTitle = bookRepository.findByTitleContaining(title, pageable);
         log.info("Fetched {} books by title", byTitle.getTotalElements());
         return bookMapper.map(byTitle, byTitle.getPageable());
     }
 
     @Override
     public BookDto getById(int id) {
-        Optional<Book> byId = bookRepository.findById(id);
-        if (byId.isPresent()) {
-            log.info("Book found with ID: {}", id);
-            return bookMapper.map(byId.get());
-        } else {
-            log.warn("Book not found with ID: {}", id);
-            throw new BookNotFoundException("Book not found with ID: " + id);
-        }
+        var byId = bookRepository.findById(id).orElseThrow(() ->
+                new BookNotFoundException("Book not found with ID: " + id));
+        log.info("Book found with ID: {}", id);
+        return bookMapper.map(byId);
     }
 
     @Override
     public Book findById(int id) {
         log.info("Fetching book entity by ID: {}", id);
-        Optional<Book> byId = bookRepository.findById(id);
-        if (byId.isEmpty()) {
-            throw new BookNotFoundException("Book not found with ID: " + id);
-        }
-        return byId.get();
+        return bookRepository.findById(id).orElseThrow(() ->
+                new BookNotFoundException("Book not found with ID: " + id));
     }
 }

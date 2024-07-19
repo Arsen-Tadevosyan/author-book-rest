@@ -45,7 +45,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/v1/users/image/").permitAll()
                 .requestMatchers("/v1/users").permitAll()
                 .requestMatchers("/countries").permitAll()
-                .requestMatchers(HttpMethod.POST,"/v1/authors").permitAll()
+                .requestMatchers(HttpMethod.POST, "/v1/authors").permitAll()
                 .requestMatchers("/v1/users/auth").permitAll()
                 .requestMatchers(HttpMethod.POST, "/v1/authors").hasAuthority(UserType.ADMIN.name())
                 .anyRequest().permitAll();

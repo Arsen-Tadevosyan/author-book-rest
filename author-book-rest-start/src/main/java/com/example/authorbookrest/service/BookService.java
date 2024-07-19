@@ -11,11 +11,12 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface BookService {
+
     BookDto save(SaveBookDto saveBookDto);
 
     List<BookDto> getRandom();
 
-    Page<BookDto> getAllByFilter(BookFilterDto bookFilterDto,Pageable pageable);
+    Page<BookDto> getAllByFilter(BookFilterDto bookFilterDto, Pageable pageable);
 
     Page<BookResponseDto> getByTitle(String title, int page, int size);
 

@@ -6,7 +6,6 @@ import com.example.authorbookrest.dto.SaveAuthorDto;
 import com.example.authorbookrest.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,17 +30,14 @@ public class AuthorEndpoint {
             @RequestParam(value = "size", required = false, defaultValue = "5") int size,
             @RequestParam(value = "orderBy", required = false, defaultValue = "id") String orderBy,
             @RequestParam(value = "order", required = false, defaultValue = "DESC") String order) {
-        Sort sort = Sort.by(Sort.Direction.fromString(order), orderBy);
-        Pageable pageable = PageRequest.of(page, size,sort);
+        var sort = Sort.by(Sort.Direction.fromString(order), orderBy);
+        var pageable = PageRequest.of(page, size, sort);
         return authorService.getAll(pageable);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AuthorResponseDto> getById(@PathVariable("id") int id) {
-        AuthorResponseDto author = authorService.getById(id);
-        if (author == null) {
-            return ResponseEntity.notFound().build();
-        }
+        var author = authorService.getById(id);
         return ResponseEntity.ok(author);
     }
 
@@ -49,19 +45,12 @@ public class AuthorEndpoint {
     @PutMapping("/{id}")
     public ResponseEntity<AuthorResponseDto> update(@PathVariable("id") int id,
                                                     @RequestBody SaveAuthorDto authorDto) {
-        AuthorResponseDto byId = authorService.getById(id);
-        if (byId == null) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(authorService.update(id, authorDto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<AuthorResponseDto> deleteById(@PathVariable("id") int id) {
-        AuthorResponseDto byId = authorService.getById(id);
-        if (byId == null) {
-            return ResponseEntity.notFound().build();
-        }
+        var byId = authorService.getById(id);
         authorService.deleteById(id);
         return ResponseEntity.ok().build();
     }

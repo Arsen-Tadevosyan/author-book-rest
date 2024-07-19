@@ -11,7 +11,6 @@ public interface FavoriteBookService {
 
     FavoriteBook save(int id, User user);
 
-
     List<BookDto> findByUser(User user);
 
     void delete(User user, int id);

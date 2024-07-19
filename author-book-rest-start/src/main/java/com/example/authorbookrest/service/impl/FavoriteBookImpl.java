@@ -4,7 +4,6 @@ import com.example.authorbookrest.dto.BookDto;
 import com.example.authorbookrest.entity.Book;
 import com.example.authorbookrest.entity.FavoriteBook;
 import com.example.authorbookrest.entity.User;
-import com.example.authorbookrest.exception.BookNotFoundException;
 import com.example.authorbookrest.exception.FavoriteBookAlreadyExistException;
 import com.example.authorbookrest.exception.FavoriteBookDoseNotExistException;
 import com.example.authorbookrest.mapper.BookMapper;
@@ -28,16 +27,12 @@ public class FavoriteBookImpl implements FavoriteBookService {
     private final BookMapper bookMapper;
 
     @Override
-    public FavoriteBook save(int id, User user) {
-        Book book = bookService.findById(id);
-        if (book == null) {
-            throw new BookNotFoundException("Book not found with ID: " + id);
-        }
-        FavoriteBook favoriteBook = favoriteBookRepository.findByUserAndBook(user, book);
-        if (favoriteBook != null) {
-            throw new FavoriteBookAlreadyExistException("Book already exist with ID: " + id);
-        }
-        FavoriteBook savedFavoriteBook = favoriteBookRepository.save(FavoriteBook.builder()
+    public FavoriteBook save(int bookId, User user) {
+        var book = bookService.findById(bookId);
+        favoriteBookRepository.findByUserAndBook(user, book).ifPresent(existing -> {
+            throw new FavoriteBookAlreadyExistException("Favorite Book already exists with ID: " + bookId);
+        });
+        var savedFavoriteBook = favoriteBookRepository.save(FavoriteBook.builder()
                 .book(book)
                 .user(user)
                 .build());
@@ -47,7 +42,7 @@ public class FavoriteBookImpl implements FavoriteBookService {
 
     @Override
     public List<BookDto> findByUser(User user) {
-        List<FavoriteBook> byUser = favoriteBookRepository.findByUser(user);
+        var byUser = favoriteBookRepository.findByUser(user);
         List<Book> books = new ArrayList<>();
         for (FavoriteBook favoriteBook : byUser) {
             books.add(favoriteBook.getBook());
@@ -58,17 +53,10 @@ public class FavoriteBookImpl implements FavoriteBookService {
 
     @Override
     public void delete(User user, int id) {
-        Book book = bookService.findById(id);
-        if (book == null) {
-            log.warn("Book not found with ID: {}", id);
-            throw new BookNotFoundException("Book not found with ID: " + id);
-        }
-        FavoriteBook byUserAndBook = favoriteBookRepository.findByUserAndBook(user, book);
-        if (byUserAndBook != null) {
-            favoriteBookRepository.delete(byUserAndBook);
-            log.info("Favorite book with ID: {} deleted for user: {}", id, user.getName());
-        } else {
-            throw new FavoriteBookDoseNotExistException("Book dose not exist with ID: " + id);
-        }
+        var book = bookService.findById(id);
+        var byUserAndBook = favoriteBookRepository.findByUserAndBook(user, book).orElseThrow(()
+                -> new FavoriteBookDoseNotExistException("Book dose not exist with ID: " + id));
+        favoriteBookRepository.delete(byUserAndBook);
+        log.info("Favorite book with ID: {} deleted for user: {}", id, user.getName());
     }
 }

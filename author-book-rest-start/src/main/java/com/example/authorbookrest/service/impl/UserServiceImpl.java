@@ -8,6 +8,7 @@ import com.example.authorbookrest.mapper.UserMapper;
 import com.example.authorbookrest.repository.UserRepository;
 import com.example.authorbookrest.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,24 +41,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByEmail(String email) {
-        Optional<User> byEmail = userRepository.findByEmail(email);
-        if (byEmail.isEmpty()) {
-       throw new UserNotFoundException("User with email: " + email + " not found");
-        }
-        return byEmail.get();
+        return userRepository.findByEmail(email).orElseThrow(()
+                -> new UserNotFoundException("User with email: " + email + " not found"));
     }
 
     @Override
     public User findById(int id) {
-        Optional<User> byId = userRepository.findById(id);
-        if (byId.isEmpty()) {
-            throw new UserNotFoundException("User with ID: " + id + " not found");
-        }
-        return byId.get();
+        return userRepository.findById(id).orElseThrow(()
+                -> new UserNotFoundException("User with ID: " + id + " not found"));
     }
 
     @Override
-    public void uploadImage(User user, MultipartFile multipartFile) throws IOException {
+    @SneakyThrows
+    public void uploadImage(User user, MultipartFile multipartFile) {
         if (multipartFile != null && !multipartFile.isEmpty()) {
             String fileName = System.currentTimeMillis() + "_" + multipartFile.getOriginalFilename();
             File destinationFile = new File(uploadImagePath, fileName);

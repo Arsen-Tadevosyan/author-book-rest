@@ -60,8 +60,8 @@ public class BookEndpoint {
     }
 
     @GetMapping("/favBook/{id}")
-    public FavoriteBook findFavBookById(@PathVariable int id,
-                                        @AuthenticationPrincipal CurrentUser currentUser) {
+    public FavoriteBook FavBookById(@PathVariable int id,
+                                    @AuthenticationPrincipal CurrentUser currentUser) {
         return favoriteBookService.save(id, currentUser.getUser());
     }
 
@@ -80,12 +80,11 @@ public class BookEndpoint {
     public Comment comment(@PathVariable int id,
                            @RequestParam String comment,
                            @AuthenticationPrincipal CurrentUser currentUser) {
-        return commentService.save(id,comment, currentUser.getUser());
+        return commentService.save(id, comment, currentUser.getUser());
     }
 
     @GetMapping("/viewComments/{id}")
     public List<Comment> viewComments(@PathVariable int id) {
-       return commentService.findByBook(id);
+        return commentService.findByBook(id);
     }
-
 }

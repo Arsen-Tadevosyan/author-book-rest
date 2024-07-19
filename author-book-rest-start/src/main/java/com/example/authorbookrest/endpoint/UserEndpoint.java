@@ -9,6 +9,7 @@ import com.example.authorbookrest.mapper.UserMapper;
 import com.example.authorbookrest.service.UserService;
 import com.example.authorbookrest.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -56,9 +57,9 @@ public class UserEndpoint {
         return ResponseEntity.ok(userMapper.map(byId));
     }
 
-    @GetMapping(value = "getImage"
-            , produces = MediaType.IMAGE_JPEG_VALUE)
-    public @ResponseBody byte[] getImage(@RequestParam("picName") String picName) throws IOException {
+    @GetMapping(value = "getImage", produces = MediaType.IMAGE_JPEG_VALUE)
+    @SneakyThrows
+    public @ResponseBody byte[] getImage(@RequestParam("picName") String picName) {
         File file = new File(uploadImagePath, picName);
         if (file.exists()) {
             return IOUtils.toByteArray(new FileInputStream(file));

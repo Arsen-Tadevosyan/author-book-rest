@@ -9,7 +9,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>author-book-rest-dto</module>
         <module>author-book-rest-start</module>
     </modules>
 </project>

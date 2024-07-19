@@ -29,4 +29,6 @@ public interface BookMapper {
     }
 
     BookResponseDto mapToBookResponseDto(Book book);
+
+    List<BookDto> mapToDto(List<Book> books);
 }

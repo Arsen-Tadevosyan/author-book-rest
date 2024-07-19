@@ -1,6 +1,5 @@
 package com.example.authorbookrest.endpoint;
 
-
 import com.example.authorbookrest.dto.AuthorResponseDto;
 import com.example.authorbookrest.dto.PagingResponseDto;
 import com.example.authorbookrest.dto.SaveAuthorDto;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthorEndpoint {
 
     private final AuthorService authorService;
-
 
     @PostMapping
     @CrossOrigin(origins = "*")

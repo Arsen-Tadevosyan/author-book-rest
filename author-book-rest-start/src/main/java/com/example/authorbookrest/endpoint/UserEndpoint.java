@@ -25,6 +25,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("v1/users")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserEndpoint {
 
     private final UserService userService;
@@ -44,9 +45,9 @@ public class UserEndpoint {
         return ResponseEntity.ok(userService.create(createUserRequest));
     }
 
-    @PostMapping("/image/{id}")
+    @PostMapping(value = "/image/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserDto> uploadImage(@PathVariable("id") int userId,
-                                               @RequestParam(value = "picture") MultipartFile multipartFile) throws IOException {
+                                               @RequestPart(value = "picture", required = false) MultipartFile multipartFile) throws IOException {
         User byId = userService.findById(userId);
         if (byId == null) {
             ResponseEntity.notFound().build();
@@ -54,6 +55,7 @@ public class UserEndpoint {
         userService.uploadImage(byId, multipartFile);
         return ResponseEntity.ok(userMapper.map(byId));
     }
+
     @GetMapping(value = "getImage"
             , produces = MediaType.IMAGE_JPEG_VALUE)
     public @ResponseBody byte[] getImage(@RequestParam("picName") String picName) throws IOException {
@@ -70,9 +72,17 @@ public class UserEndpoint {
         if (user == null || !passwordEncoder.matches(authRequestDto.getPassword(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        UserDto userDto = userMapper.map(user);
         return ResponseEntity.ok(AuthResponseDto.builder()
                 .token(jwtTokenUtil.generateToken(user.getEmail()))
-                .userDto(userMapper.map(user))
+                .userDto(userDto)
                 .build());
     }
+
+    @GetMapping("/profile/{id}")
+    public UserDto getProfile(@PathVariable("id") int userId) {
+        User user = userService.findById(userId);
+        return userMapper.map(user);
+    }
+
 }

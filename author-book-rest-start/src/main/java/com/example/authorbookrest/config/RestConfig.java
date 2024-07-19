@@ -10,11 +10,6 @@ import org.springframework.web.client.RestTemplate;
 public class RestConfig {
 
     @Bean
-    public RestTemplate getRestTemplate() {
-        return new RestTemplate();
-    }
-
-    @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
     }

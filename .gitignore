@@ -1,0 +1,3 @@
+# Project exclude paths
+/author-book-rest-dto/target/
+/author-book-rest-start/target/
